@@ -1143,6 +1143,15 @@ void FCEUI_SetSoundQuality(int quality) {
 	SetSoundVariables();
 }
 
+bool use_smooth = false;
+
+void FCEUI_StateType(int type) {
+	if(type == 1)
+	   use_smooth = true;
+	else
+	   use_smooth = false;
+}
+
 void FCEUI_SetSoundVolume(uint32 volume) {
 	FSettings.SoundVolume = volume;
 }
@@ -1226,6 +1235,59 @@ SFORMAT FCEUSND_STATEINFO[] = {
 
 	/* wave buffer is used for filtering, only need first 17 values from it */
 	{ &Wave, 32 * sizeof(int32), "WAVE"},
+	{ 0 }
+};
+
+SFORMAT FCEUSND_STATEINFOII[] = {
+	{ &fhcnt, 4 | FCEUSTATE_RLSB, "FHCN" },
+	{ &fcnt, 1, "FCNT" },
+	{ PSG, 0x10, "PSG" },
+	{ &EnabledChannels, 1, "ENCH" },
+	{ &IRQFrameMode, 1, "IQFM" },
+	{ &nreg, 2 | FCEUSTATE_RLSB, "NREG" },
+	{ &TriMode, 1, "TRIM" },
+	{ &TriCount, 1, "TRIC" },
+
+	{ &EnvUnits[0].Speed, 1, "E0SP" },
+	{ &EnvUnits[1].Speed, 1, "E1SP" },
+	{ &EnvUnits[2].Speed, 1, "E2SP" },
+
+	{ &EnvUnits[0].Mode, 1, "E0MO" },
+	{ &EnvUnits[1].Mode, 1, "E1MO" },
+	{ &EnvUnits[2].Mode, 1, "E2MO" },
+
+	{ &EnvUnits[0].DecCountTo1, 1, "E0D1" },
+	{ &EnvUnits[1].DecCountTo1, 1, "E1D1" },
+	{ &EnvUnits[2].DecCountTo1, 1, "E2D1" },
+
+	{ &EnvUnits[0].decvolume, 1, "E0DV" },
+	{ &EnvUnits[1].decvolume, 1, "E1DV" },
+	{ &EnvUnits[2].decvolume, 1, "E2DV" },
+
+	{ &lengthcount[0], 4 | FCEUSTATE_RLSB, "LEN0" },
+	{ &lengthcount[1], 4 | FCEUSTATE_RLSB, "LEN1" },
+	{ &lengthcount[2], 4 | FCEUSTATE_RLSB, "LEN2" },
+	{ &lengthcount[3], 4 | FCEUSTATE_RLSB, "LEN3" },
+	{ sweepon, 2, "SWEE" },
+	{ &curfreq[0], 4 | FCEUSTATE_RLSB, "CRF1" },
+	{ &curfreq[1], 4 | FCEUSTATE_RLSB, "CRF2" },
+	{ SweepCount, 2, "SWCT" },
+
+	{ &SIRQStat, 1, "SIRQ" },
+
+	{ &DMCacc, 4 | FCEUSTATE_RLSB, "5ACC" },
+	{ &DMCBitCount, 1, "5BIT" },
+	{ &DMCAddress, 4 | FCEUSTATE_RLSB, "5ADD" },
+	{ &DMCSize, 4 | FCEUSTATE_RLSB, "5SIZ" },
+	{ &DMCShift, 1, "5SHF" },
+
+	{ &DMCHaveDMA, 1, "5VDM" },
+	{ &DMCHaveSample, 1, "5VSP" },
+
+	{ &DMCSizeLatch, 1, "5SZL" },
+	{ &DMCAddressLatch, 1, "5ADL" },
+	{ &DMCFormat, 1, "5FMT" },
+	{ &RawDALatch, 1, "RWDA" },
 	{ 0 }
 };
 

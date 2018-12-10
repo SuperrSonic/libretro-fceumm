@@ -199,6 +199,8 @@ void FCEUI_Sound(int Rate);
 void FCEUI_SetSoundVolume(uint32 volume);
 void FCEUI_SetSoundQuality(int quality);
 
+void FCEUI_StateType(int type);
+
 void FCEUI_SelectState(int);
 
 /* "fname" overrides the default save state filename code if non-NULL. */

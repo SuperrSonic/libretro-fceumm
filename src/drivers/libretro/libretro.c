@@ -102,6 +102,7 @@ unsigned sndsamplerate = 48000;
 unsigned sndquality = 0;
 unsigned sndvolume = 150;
 unsigned swapDuty = 0;
+unsigned cur_type = 0;
 
 static int32_t *sound = 0;
 static uint32_t JSReturn = 0;
@@ -222,7 +223,7 @@ FILE *FCEUD_UTF8fopen(const char *n, const char *m)
 }
 
 /*palette for FCEU*/
-#define PAL_TOTAL   16 /* total no. of palettes in palettes[] */
+#define PAL_TOTAL   20 /* total no. of palettes in palettes[] */
 #define PAL_DEFAULT (PAL_TOTAL + 1)
 #define PAL_RAW     (PAL_TOTAL + 2)
 #define PAL_CUSTOM  (PAL_TOTAL + 3)
@@ -236,25 +237,43 @@ struct st_palettes {
 };
 
 struct st_palettes palettes[] = {
-   { "asqrealc", "AspiringSquire's Real palette",
-      { 0x6c6c6c, 0x00268e, 0x0000a8, 0x400094,
-	      0x700070, 0x780040, 0x700000, 0x621600,
-	      0x442400, 0x343400, 0x005000, 0x004444,
-	      0x004060, 0x000000, 0x101010, 0x101010,
-	      0xbababa, 0x205cdc, 0x3838ff, 0x8020f0,
-	      0xc000c0, 0xd01474, 0xd02020, 0xac4014,
-	      0x7c5400, 0x586400, 0x008800, 0x007468,
-	      0x00749c, 0x202020, 0x101010, 0x101010,
-	      0xffffff, 0x4ca0ff, 0x8888ff, 0xc06cff,
-	      0xff50ff, 0xff64b8, 0xff7878, 0xff9638,
-	      0xdbab00, 0xa2ca20, 0x4adc4a, 0x2ccca4,
-	      0x1cc2ea, 0x585858, 0x101010, 0x101010,
-	      0xffffff, 0xb0d4ff, 0xc4c4ff, 0xe8b8ff,
-	      0xffb0ff, 0xffb8e8, 0xffc4c4, 0xffd4a8,
-	      0xffe890, 0xf0f4a4, 0xc0ffc0, 0xacf4f0,
-	      0xa0e8ff, 0xc2c2c2, 0x202020, 0x101010 }
-	},
-   { "nintendo-vc", "Virtual Console palette",
+   { "animal-crossing", "Animal Crossing palette",
+	   { 0x848484, 0x0000BC, 0x3001BC, 0x8400A4,
+           0xBD006A, 0xB5001A, 0xB40000, 0x942000,
+		   0x7C2801, 0x013900, 0x004808, 0x003920,
+   		   0x012863, 0x000000, 0x000000, 0x000000,
+		   0xCFCDCF, 0x0159FF, 0x423AFF, 0xB431CE,
+		   0xFF31AC, 0xFF315A, 0xFF3119, 0xD54A01,
+		   0xC46100, 0x397901, 0x188510, 0x009662,
+		   0x0084C4, 0x101010, 0x000000, 0x000000,
+		   0xFFFFFF, 0x0097FF, 0x6A85FF, 0xD769FF,
+		   0xFF72CE, 0xFF699D, 0xFF785A, 0xFF965B,
+		   0xFFA631, 0xA3BF00, 0x52DF6A, 0x4AD6AD,
+		   0x00DFFD, 0x636163, 0x000000, 0x000000,
+		   0xFFFFFF, 0x84BFFF, 0xBCBEFE, 0xD6BFFE,
+		   0xFFBDED, 0xFFBDCE, 0xFFC5B6, 0xFECEAD,
+		   0xFFDFA4, 0xCDE69B, 0xADEEB5, 0xADF7ED,
+		   0xB5EFFF, 0xDEDFDD, 0x000000, 0x000000 }
+   },
+   { "restored-wii-vc", "Restored Wii VC palette",
+	   { 0x666666, 0x000095, 0x10008B, 0x39007D,
+           0x5C0068, 0x660000, 0x5C0000, 0x391800,
+		   0x223700, 0x004316, 0x004300, 0x003916,
+   		   0x022D5E, 0x000000, 0x000000, 0x000000,
+		   0xA39EA3, 0x0043B9, 0x4502F1, 0x6902CF,
+		   0x8C00AC, 0x960050, 0x962E02, 0x7E4200,
+		   0x5C6600, 0x227D02, 0x167D02, 0x027D46,
+		   0x02667E, 0x161616, 0x000000, 0x000000,
+		   0xF2F2F2, 0x689EFF, 0x8C7BFF, 0xB970FF,
+		   0xE671F2, 0xF266B9, 0xFE8968, 0xCF9E46,
+		   0xACA03B, 0x7EBC02, 0x4EC745, 0x45C77E,
+		   0x50C7C6, 0x4E4E4E, 0x000000, 0x000000,
+		   0xFFFFFF, 0xC4DCFE, 0xC6C7F4, 0xDBC7FF,
+		   0xE9BDFF, 0xF2C6DC, 0xF4D2C4, 0xDBC8AE,
+		   0xDBDDA0, 0xCFE9AE, 0xB9EAAC, 0xAEDCB9,
+		   0xA1D2C6, 0xDEDEDE, 0x000000, 0x000000 }
+   },
+   { "wii-vc", "Wii Virtual Console palette",
 	   { 0x494949, 0x00006a, 0x090063, 0x290059,
 		   0x42004a, 0x490000, 0x420000, 0x291100,
 		   0x182700, 0x003010, 0x003000, 0x002910,
@@ -271,6 +290,42 @@ struct st_palettes palettes[] = {
 		   0xa687bc, 0xad8d9d, 0xae968c, 0x9c8f7c,
 		   0x9c9e72, 0x94a67c, 0x84a77b, 0x7c9d84,
 		   0x73968d, 0xdedede, 0x000000, 0x000000 }
+   },
+   { "n3ds-vc", "Nintendo 3DS VC palette",
+	   { 0x737373, 0x21188c, 0x0000ad, 0x42009c,
+			0x8c0073, 0xad0010, 0xa50000, 0x7b0800,
+			0x422900, 0x004200, 0x005200, 0x003910,
+			0x18395a, 0x000000, 0x000000, 0x000000,
+			0xbdbdbd, 0x0073ef, 0x2139ef, 0x8400f7,
+			0xbd00bd, 0xe7005a, 0xde2900, 0xce4a08,
+			0x8c7300, 0x009400, 0x00ad00, 0x009439,
+			0x00848c, 0x101010, 0x000000, 0x000000,
+			0xffffff, 0x39bdff, 0x5a94ff, 0xa58cff,
+			0xf77bff, 0xff73b5, 0xff7363, 0xff9c39,
+			0xf7bd39, 0x84d610, 0x4ade4a, 0x5aff9c,
+			0x00efde, 0x393939, 0x000000, 0x000000,
+			0xffffff, 0xade7ff, 0xc6d6ff, 0xd6ceff,
+			0xffc6ff, 0xffc6de, 0xffbdb5, 0xffdead,
+			0xffe7a5, 0xe7ffa5, 0xadf7bd, 0xb5ffce,
+			0x9cfff7, 0x8c8c8c, 0x000000, 0x000000 }
+   },
+   { "nes-classic", "NES Classic palette",
+	   { 0x60615F, 0x000083, 0x1D0195, 0x340875,
+		   0x51055E, 0x56000F, 0x4C0700, 0x372308,
+		   0x203A0B, 0x0F4B0E, 0x194C16, 0x02421E,
+		   0x023154, 0x000000, 0x000000, 0x000000,
+		   0xA9AAA8, 0x104BBF, 0x4712D8, 0x6300CA,
+		   0x8800A9, 0x930B46, 0x8A2D04, 0x6F5206,
+		   0x5C7114, 0x1B8D12, 0x199509, 0x178448,
+		   0x206B8E, 0x000000, 0x000000, 0x000000,
+		   0xFBFBFB, 0x6699F8, 0x8974F9, 0xAB58F8,
+		   0xD557EF, 0xDE5FA9, 0xDC7F59, 0xC7A224,
+		   0xA7BE03, 0x75D703, 0x60E34F, 0x3CD68D,
+		   0x56C9CC, 0x414240, 0x000000, 0x000000,
+		   0xFBFBFB, 0xBED4FA, 0xC9C7F9, 0xD7BEFA,
+		   0xE8B8F9, 0xF5BAE5, 0xF3CAC2, 0xDFCDA7,
+		   0xD9E09C, 0xC9EB9E, 0xC0EDB8, 0xB5F4C7,
+		   0xB9EAE9, 0xABABAB, 0x000000, 0x000000 }
    },
    { "rgb", "Nintendo RGB PPU palette",
 	   { 0x6D6D6D, 0x002492, 0x0000DB, 0x6D49DB,
@@ -290,7 +345,43 @@ struct st_palettes palettes[] = {
 		   0xFFFF6D, 0xB6FF49, 0x92FF6D, 0x49FFDB,
 		   0x92DBFF, 0x929292, 0x000000, 0x000000 }
    },
-   { "yuv-v3", "FBX's YUV-V3 palette",
+   { "agb", "Mother 1+2 AGB palette",
+	   { 0x9c9c9c, 0x003abd, 0x0000bd, 0x3a00bd,
+          0x7b007b, 0xbd003a, 0xbd0000, 0xbd3a00,
+          0x7b7b00, 0x3abd00, 0x00bd00, 0x00bd3a,
+          0x007b7b, 0x000000, 0x000000, 0x000000,
+          0xcecece, 0x086bcE, 0x3a3aff, 0x6b08ce,
+          0x9c009c, 0xce086b, 0xff3a3a, 0xce6b08,
+          0x9c9c00, 0x6bce08, 0x3aff3a, 0x08ce6b,
+          0x009c9c, 0xcecece, 0xcecece, 0xcecece,
+          0xefefef, 0x5a9cde, 0x7b7bff, 0x9c5ade,
+          0xbd3abd, 0xde5a9c, 0xff7b7b, 0xde9c5a,
+          0xbdbd3a, 0x9cde5a, 0x7bff7b, 0x5ade9c,
+          0x3abdbd, 0xdedede, 0xdedede, 0xdedede,
+          0xffffff, 0xadceef, 0xbdbdff, 0xceadef,
+          0xde9cde, 0xefadce, 0xffbdbd, 0xefcead,
+          0xdede9c, 0xceefad, 0xbdffbd, 0xadefce,
+          0x9cdede, 0x73a5bd, 0x000000, 0x000000 }
+   },
+   { "asqrealc", "AspiringSquire's Real palette",
+      { 0x6c6c6c, 0x00268e, 0x0000a8, 0x400094,
+	      0x700070, 0x780040, 0x700000, 0x621600,
+	      0x442400, 0x343400, 0x005000, 0x004444,
+	      0x004060, 0x000000, 0x101010, 0x101010,
+	      0xbababa, 0x205cdc, 0x3838ff, 0x8020f0,
+	      0xc000c0, 0xd01474, 0xd02020, 0xac4014,
+	      0x7c5400, 0x586400, 0x008800, 0x007468,
+	      0x00749c, 0x202020, 0x101010, 0x101010,
+	      0xffffff, 0x4ca0ff, 0x8888ff, 0xc06cff,
+	      0xff50ff, 0xff64b8, 0xff7878, 0xff9638,
+	      0xdbab00, 0xa2ca20, 0x4adc4a, 0x2ccca4,
+	      0x1cc2ea, 0x585858, 0x101010, 0x101010,
+	      0xffffff, 0xb0d4ff, 0xc4c4ff, 0xe8b8ff,
+	      0xffb0ff, 0xffb8e8, 0xffc4c4, 0xffd4a8,
+	      0xffe890, 0xf0f4a4, 0xc0ffc0, 0xacf4f0,
+	      0xa0e8ff, 0xc2c2c2, 0x202020, 0x101010 }
+	},
+    { "yuv-v3", "FBX's YUV-V3 palette",
 	   { 0x666666, 0x002A88, 0x1412A7, 0x3B00A4,
 		   0x5C007E, 0x6E0040, 0x6C0700, 0x561D00,
 		   0x333500, 0x0C4800, 0x005200, 0x004C18,
@@ -469,24 +560,6 @@ struct st_palettes palettes[] = {
 		   0xF8D7FE, 0xFCD6F5, 0xFDDBCF, 0xF9E7B5,
 		   0xF1F0AA, 0xDAFAA9, 0xC9FFBC, 0xC3FBD7,
 		   0xC4F6F6, 0xBEC1BE, 0x000000, 0x000000 }
-   },
-   { "nes-classic-fbx-fs", "FBX's NES-Classic FS palette",
-	   { 0x60615F, 0x000083, 0x1D0195, 0x340875,
-		   0x51055E, 0x56000F, 0x4C0700, 0x372308,
-		   0x203A0B, 0x0F4B0E, 0x194C16, 0x02421E,
-		   0x023154, 0x000000, 0x000000, 0x000000,
-		   0xA9AAA8, 0x104BBF, 0x4712D8, 0x6300CA,
-		   0x8800A9, 0x930B46, 0x8A2D04, 0x6F5206,
-		   0x5C7114, 0x1B8D12, 0x199509, 0x178448,
-		   0x206B8E, 0x000000, 0x000000, 0x000000,
-		   0xFBFBFB, 0x6699F8, 0x8974F9, 0xAB58F8,
-		   0xD557EF, 0xDE5FA9, 0xDC7F59, 0xC7A224,
-		   0xA7BE03, 0x75D703, 0x60E34F, 0x3CD68D,
-		   0x56C9CC, 0x414240, 0x000000, 0x000000,
-		   0xFBFBFB, 0xBED4FA, 0xC9C7F9, 0xD7BEFA,
-		   0xE8B8F9, 0xF5BAE5, 0xF3CAC2, 0xDFCDA7,
-		   0xD9E09C, 0xC9EB9E, 0xC0EDB8, 0xB5F4C7,
-		   0xB9EAE9, 0xABABAB, 0x000000, 0x000000 }
    },
    { "nescap", "RGBSource's NESCAP palette",
 	   { 0x646365, 0x001580, 0x1D0090, 0x380082,
@@ -703,17 +776,18 @@ void retro_set_environment(retro_environment_t cb)
    static const struct retro_variable vars[] = {
       { "fceumm_region", "Region Override; Auto|NTSC|PAL|Dendy" },
       { "fceumm_aspect", "Preferred aspect ratio; 8:7 PAR|4:3" },
-      { "fceumm_palette", "Color Palette; default|asqrealc|nintendo-vc|rgb|yuv-v3|unsaturated-final|sony-cxa2025as-us|pal|bmf-final2|bmf-final3|smooth-fbx|composite-direct-fbx|pvm-style-d93-fbx|ntsc-hardware-fbx|nes-classic-fbx-fs|nescap|wavebeam|raw|custom" },
+      { "fceumm_palette", "Color Palette; default|animal-crossing|restored-wii-vc|wii-vc|n3ds-vc|nes-classic|rgb|agb|asqrealc|yuv-v3|unsaturated-final|sony-cxa2025as-us|pal|bmf-final2|bmf-final3|smooth-fbx|composite-direct-fbx|pvm-style-d93-fbx|ntsc-hardware-fbx|nescap|wavebeam|raw|custom" },
       { "fceumm_up_down_allowed", "Allow Opposing Directions; disabled|enabled" },
 #ifdef PSP
       { "fceumm_overscan", "Crop Overscan; enabled|disabled" },
 #else
       { "fceumm_overscan_h", "Crop Overscan (Horizontal); disabled|enabled" },
-      { "fceumm_overscan_v", "Crop Overscan (Vertical); enabled|disabled" },
+      { "fceumm_overscan_v", "Crop Overscan (Vertical); disabled|enabled" },
 #endif
       { "fceumm_nospritelimit", "No Sprite Limit; disabled|enabled" },
       { "fceumm_sndvolume", "Sound Volume; 150|160|170|180|190|200|210|220|230|240|250|0|10|20|30|40|50|60|70|80|90|100|110|120|130|140" },
-      { "fceumm_sndquality", "Sound Quality; Low|High|Very High" },
+      { "fceumm_sndquality", "Sound Quality; Normal|High|Very High" },
+	  { "fceumm_statetype", "Save State Type; Compatible|Obscure" },
       { "fceumm_swapduty", "Swap Duty Cycles; disabled|enabled" },
 #ifdef DEBUG
       { "fceumm_apu_1", "Enable Sound Channel 1 (Square 1); enabled|disabled" },
@@ -995,38 +1069,46 @@ static void check_variables(bool startup)
          current_palette = PAL_RAW;
       else if (!strcmp(var.value, "custom"))
          current_palette = PAL_CUSTOM;
-      else if (!strcmp(var.value, "asqrealc"))
+      else if (!strcmp(var.value, "animal-crossing"))
          current_palette = 0;
-      else if (!strcmp(var.value, "nintendo-vc"))
+      else if (!strcmp(var.value, "restored-wii-vc"))
          current_palette = 1;
-      else if (!strcmp(var.value, "rgb"))
+      else if (!strcmp(var.value, "wii-vc"))
          current_palette = 2;
-      else if (!strcmp(var.value, "yuv-v3"))
+      else if (!strcmp(var.value, "n3ds-vc"))
          current_palette = 3;
-      else if (!strcmp(var.value, "unsaturated-final"))
+      else if (!strcmp(var.value, "nes-classic"))
          current_palette = 4;
-      else if (!strcmp(var.value, "sony-cxa2025as-us"))
+      else if (!strcmp(var.value, "rgb"))
          current_palette = 5;
-      else if (!strcmp(var.value, "pal"))
+      else if (!strcmp(var.value, "agb"))
          current_palette = 6;
-      else if (!strcmp(var.value, "bmf-final2"))
+      else if (!strcmp(var.value, "asqrealc"))
          current_palette = 7;
-      else if (!strcmp(var.value, "bmf-final3"))
+      else if (!strcmp(var.value, "yuv-v3"))
          current_palette = 8;
-      else if (!strcmp(var.value, "smooth-fbx"))
+      else if (!strcmp(var.value, "unsaturated-final"))
          current_palette = 9;
-      else if (!strcmp(var.value, "composite-direct-fbx"))
+      else if (!strcmp(var.value, "sony-cxa2025as-us"))
          current_palette = 10;
-      else if (!strcmp(var.value, "pvm-style-d93-fbx"))
+      else if (!strcmp(var.value, "pal"))
          current_palette = 11;
-      else if (!strcmp(var.value, "ntsc-hardware-fbx"))
+      else if (!strcmp(var.value, "bmf-final2"))
          current_palette = 12;
-      else if (!strcmp(var.value, "nes-classic-fbx-fs"))
+      else if (!strcmp(var.value, "bmf-final3"))
          current_palette = 13;
-      else if (!strcmp(var.value, "nescap"))
+      else if (!strcmp(var.value, "smooth-fbx"))
          current_palette = 14;
-      else if (!strcmp(var.value, "wavebeam"))
+      else if (!strcmp(var.value, "composite-direct-fbx"))
          current_palette = 15;
+      else if (!strcmp(var.value, "pvm-style-d93-fbx"))
+         current_palette = 16;
+      else if (!strcmp(var.value, "ntsc-hardware-fbx"))
+         current_palette = 17;
+      else if (!strcmp(var.value, "nescap"))
+         current_palette = 18;
+      else if (!strcmp(var.value, "wavebeam"))
+         current_palette = 19;
 
       if (current_palette != orig_value)
          retro_set_custom_palette();
@@ -1206,7 +1288,7 @@ static void check_variables(bool startup)
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
    {
       unsigned oldval = sndquality;
-      if (!strcmp(var.value, "Low"))
+      if (!strcmp(var.value, "Normal"))
          sndquality = 0;
       else if (!strcmp(var.value, "High"))
          sndquality = 1;
@@ -1228,6 +1310,19 @@ static void check_variables(bool startup)
    {
       retro_get_system_av_info(&av_info);
       environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &av_info);
+   }
+
+   var.key = "fceumm_statetype";
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      unsigned oldtype = cur_type;
+      if (!strcmp(var.value, "Compatible"))
+         cur_type = 0;
+      else if (!strcmp(var.value, "Obscure"))
+         cur_type = 1;
+      if (cur_type != oldtype)
+         FCEUI_StateType(cur_type);
    }
 
    var.key = "fceumm_swapduty";

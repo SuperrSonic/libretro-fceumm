@@ -51,6 +51,7 @@ static int SFEXINDEX;
 
 extern SFORMAT FCEUPPU_STATEINFO[];
 extern SFORMAT FCEUSND_STATEINFO[];
+extern SFORMAT FCEUSND_STATEINFOII[];
 extern SFORMAT FCEUCTRL_STATEINFO[];
 
 SFORMAT SFCPU[] = {
@@ -78,6 +79,8 @@ SFORMAT SFCPUC[] = {
    { &X.mooPI, 1, "MooP"},
    { 0 }
 };
+
+extern bool use_smooth;
 
 static int SubWrite(memstream_t *mem, SFORMAT *sf)
 {
@@ -225,7 +228,7 @@ static int ReadStateChunks(memstream_t *st, int32 totalsize)
                ret = 0;
             break;
          case 5:
-            if (!ReadStateChunk(st, FCEUSND_STATEINFO, size))
+            if (!ReadStateChunk(st, use_smooth ? FCEUSND_STATEINFO : FCEUSND_STATEINFOII, size))
                ret = 0;
             break;
          case 0x10:
@@ -264,7 +267,7 @@ void FCEUSS_Save_Mem(void)
    totalsize += WriteStateChunk(mem, 2, SFCPUC);
    totalsize += WriteStateChunk(mem, 3, FCEUPPU_STATEINFO);
    totalsize += WriteStateChunk(mem, 4, FCEUCTRL_STATEINFO);
-   totalsize += WriteStateChunk(mem, 5, FCEUSND_STATEINFO);
+   totalsize += WriteStateChunk(mem, 5, use_smooth ? FCEUSND_STATEINFO : FCEUSND_STATEINFOII);
 
    if (SPreSave)
       SPreSave();
